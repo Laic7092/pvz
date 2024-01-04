@@ -1,14 +1,18 @@
+const sprites = new Map()
+sprites.set('ground', 'assets/img/dark.png')
+
 class Cell {
     // 贴图和位置还有待思考。。。
-    type = 'ground' // 地板，草地,水面，屋顶
+    type // 地板，草地,水面，屋顶
     position = { x: 0, y: 0 }
     size = 20
     baseSprite
     isEmpty = true
     curPlant
     extraSprite
-    constructor(type, position) {
+    constructor(type = 'ground', position) {
         this.type = type
+        this.baseSprite = sprites.get(this.type)
         this.position = position
     }
 
@@ -50,9 +54,11 @@ class Floor {
         this.row = row
         this.col = col
         const cells = Array.from({ length: this.row }, () => new Array(this.col).fill(new Cell()));
-
+        this.cells = cells
     }
 
 
 }
+
+export default Floor
 
