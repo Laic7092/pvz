@@ -1,5 +1,5 @@
 import Card from "./card.js"
-import { Size2D } from "../basic/basic.js"
+import { Size2D, Interable } from "../basic/basic.js"
 
 const size2D = new Size2D({
     width: 75,
@@ -15,6 +15,12 @@ export default class SelectBar {
                 this.cards.push(new Card(size2D, type, name))
             })
         }
+        this.cards.forEach(card => {
+            card.select = (e) => {
+                console.log(e, card)
+            }
+            card.interation = new Interable('click', card.select)
+        })
     }
 
     get length() {

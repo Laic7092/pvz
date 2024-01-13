@@ -6,3 +6,20 @@ export class Size2D {
         this.height = height
     }
 }
+
+export class Renderable {
+    enabled
+    constructor() {
+        this.enabled = true
+    }
+}
+
+export class Interable {
+    enabled
+    type
+    constructor(type,callBack) {
+        this.enabled = true
+        this.type =type
+        this.callBack = callBack
+    }
+}

@@ -1,7 +1,7 @@
 import * as PIXI from './pixi.mjs'
 import Floor from "./modules/gameScene/floor.js"
 import SelectBar from './modules/ui/selectBar.js'
-
+import Hand from './modules/utils/hand.js'
 
 const app = new PIXI.Application({ background: '#1099bb', resizeTo: window });
 document.body.appendChild(app.view);
@@ -33,9 +33,13 @@ container1.y = 0
 app.stage.addChild(container1)
 
 selectBar.cards.forEach((card, idx) => {
-    debugger
+    const { interation } = card
     const path = card.content.baseSpritePath
     const sprite = PIXI.Sprite.from(path)
+    if (interation) {
+        sprite.eventMode = 'static'
+        sprite.on(interation.type, interation.callBack)
+    }
     const { width, height } = card.size
     sprite.position.x = idx * card.size.width * idx
     sprite.width = width
@@ -43,6 +47,18 @@ selectBar.cards.forEach((card, idx) => {
     container1.addChild(sprite)
 })
 
+const hand = new PIXI.Container()
+// hand.addChild(PIXI.Sprite.from('/assets/img/dark.png'))
+hand.eventMode = 'dynamic'
+hand.on('globalmousemove', (e) => {
+    // console.log(e)
+    const { x, y } = e
+    hand.x = x
+    hand.y = y
+})
+app.stage.addChild(hand)
+
+console.log(app.stage)
 
 // app.stage.addChild(floor)
 // const floor = floorObj.cells.forEach(row => {
