@@ -1,4 +1,4 @@
-export default class Hand {
+class Hand {
     // 手中有？可以和啥交互？感觉这海曼重要
     content
     source
@@ -7,3 +7,5 @@ export default class Hand {
 
     }
 }
+
+export default new Hand()

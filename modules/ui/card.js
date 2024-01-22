@@ -7,8 +7,10 @@ export default class Card {
     border
     margin
     content
-    constructor(size2D, type = 'plant', name = 'sunFlower') {
-        this.size = new Size2D(size2D)
+    interactive
+    renderable
+    constructor(size = new Size2D(), type = 'plant', name = 'sunFlower') {
+        this.size = size
         if (type === 'plant')
             this.content = plantMap.get(name)
     }

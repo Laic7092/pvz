@@ -33,40 +33,39 @@ container1.y = 0
 app.stage.addChild(container1)
 
 selectBar.cards.forEach((card, idx) => {
-    const { interation } = card
+    const { interactive, renderable } = card
     const path = card.content.baseSpritePath
     const sprite = PIXI.Sprite.from(path)
-    if (interation) {
-        sprite.eventMode = 'static'
-        sprite.on(interation.type, interation.callBack)
+    if (interactive) {
+        const { eventMode, eventType, callBack } = interactive
+        sprite.eventMode = eventMode
+        sprite.cursor = 'pointer'
+        sprite.on(eventType, callBack)
     }
-    const { width, height } = card.size
-    sprite.position.x = idx * card.size.width * idx
-    sprite.width = width
-    sprite.height = height
+    if (sprite.isInteractive()) {
+        // debugger
+        // sprite is interactive
+    }
+    const { size, position } = renderable
+    sprite.position.x = position.x
+    sprite.width = size.width
+    sprite.height = size.height
     container1.addChild(sprite)
 })
 
 const hand = new PIXI.Container()
 // hand.addChild(PIXI.Sprite.from('/assets/img/dark.png'))
 hand.eventMode = 'dynamic'
-hand.on('globalmousemove', (e) => {
+hand.on('globalpointermove', (e) => {
     // console.log(e)
     const { x, y } = e
     hand.x = x
     hand.y = y
+    // console.log(hand)
 })
 app.stage.addChild(hand)
 
 console.log(app.stage)
-
-// app.stage.addChild(floor)
-// const floor = floorObj.cells.forEach(row => {
-//     row.forEach(cell => {
-//         console.log(cell.baseSprite)
-//     })
-// });
-
 
 
 
