@@ -17,10 +17,11 @@ export default class Cell {
     }
 
     plant(plant) {
-        if (!this.isEmpty) {
+        if (this.isEmpty && plant) {
             this.curPlant = plant
             this.isEmpty = false
             this.extraSprite = plant.baseSpritePath
+            console.log(plant)
         }
     }
 

@@ -11,10 +11,9 @@ const sizeY = 150
 // 想想gameloop，每次循环我会监听输入，然后修改我自己的对象，貌似需要一种同步机制，监听我的对象的变更，修改pixi内部的对象
 
 class Floor {
-    row = 6
-    col = 9
-    cells = null
-
+    row
+    col
+    cells
     constructor(option) {
         option = {
             row: 6,
@@ -43,12 +42,26 @@ class Floor {
         // console.log(this.cells)
     }
 
-    updateCell(row, col) {
-        if (typeof row === 'number' && typeof col === 'number') {
-            const cell = this.cells[row][col]
-            console.log(cell)
-            // const 
-        }
+    getCell(x, y) {
+        return floorView.getChildAt(x * this.row + y)
+    }
+
+    updateCell(x, y) {
+        const content = handModel.releaseObject()
+        if (!content) return
+        // debugger
+        const mcell = this.cells[x][y]
+        // const vcell = this.getCell(x, y)
+        const vcell = mcell.test
+
+        const { baseSpritePath: path } = content
+        const sprite = PIXI.Sprite.from(path)
+        sprite.width = 75
+        sprite.height = 75
+        vcell.addChild(sprite)
+        // console.log(cell, vcell)
+        // console.log(handModel)
+        // cell.plant()
     }
 }
 
@@ -61,10 +74,12 @@ const { cells, row, col } = floorModel
 for (let i = 0; i < row; i++) {
     const row = []
     for (let j = 0; j < col; j++) {
-        const { baseSpritePath: path, position } = cells[i][j]
+        const cell = cells[i][j]
+        const { baseSpritePath: path, position } = cell 
         const grass = PIXI.Sprite.from(path)
         grass.position.x = position.x
         grass.position.y = position.y
+        cell.test = grass
         row.push(grass)
     }
     floorView.addChild(...row)
@@ -72,22 +87,29 @@ for (let i = 0; i < row; i++) {
 
 floorView.eventMode = 'static'
 
+
+floorView.on('pointerdown', (e) => {
+    const { x, y } = e
+    const localX = x - 100
+    const loclaY = y - 100
+    const _x = Math.floor(loclaY / sizeY)
+    const _y = Math.floor(localX / sizeX)
+    floorModel.updateCell(_x, _y)
+})
 floorView.on('pointermove', (e) => {
     const { x, y } = e
     // console.log('move', { x, y }, e)
     const localX = x - 100
     const loclaY = y - 100
-    const row = Math.floor(localX / sizeX)
-    const col = Math.floor(loclaY / sizeY)
-    // console.log('x:', Math.floor(localX / sizeX), 'y:', Math.floor(loclaY / sizeY))
-    floorModel.updateCell(row, col)
+    const row = Math.floor(loclaY / sizeY)
+    const col = Math.floor(localX / sizeX)
+    // console.log('x:', row, 'y:', col)
+    // floorModel.updateCell(row, col)
 
 })
-// console.log(floorModel, floorView)
-const model = floorModel
-const view = floorView
+
 export {
-    model,
-    view
+    floorModel,
+    floorView
 }
 
