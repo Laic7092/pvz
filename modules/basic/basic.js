@@ -16,7 +16,7 @@ export class Vector2 {
     }
 }
 
-export class Renderable {
+export class Renderer {
     enabled
     position
     size
@@ -27,7 +27,7 @@ export class Renderable {
     }
 }
 
-export class Interactive {
+export class Interaction {
     eventMode
     eventType
     enabled
@@ -49,4 +49,4 @@ export class Interactive {
 // scale	Scale is specified as a percent with 1.0 being 100% or actual-size, and can be set independently for the x and y axis
 // skew	Skew transforms the object in x and y similar to the CSS skew() function, and is specified in radians
 // visible	Whether the object is visible or not, as a boolean value - prevents updating and rendering object and children
-// renderable	Whether the object should be rendered - when false, object will still be updated, but won't be rendered, doesn't affect children
+// renderer	Whether the object should be rendered - when false, object will still be updated, but won't be rendered, doesn't affect children

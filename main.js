@@ -33,20 +33,20 @@ container1.y = 0
 app.stage.addChild(container1)
 
 selectBar.cards.forEach((card, idx) => {
-    const { interactive, renderable } = card
+    const { interaction, renderer } = card
     const path = card.content.baseSpritePath
     const sprite = PIXI.Sprite.from(path)
-    if (interactive) {
-        const { eventMode, eventType, callBack } = interactive
+    if (interaction) {
+        const { eventMode, eventType, callBack } = interaction
         sprite.eventMode = eventMode
         sprite.cursor = 'pointer'
         sprite.on(eventType, callBack)
     }
     if (sprite.isInteractive()) {
         // debugger
-        // sprite is interactive
+        // sprite is interaction
     }
-    const { size, position } = renderable
+    const { size, position } = renderer
     sprite.position.x = position.x
     sprite.width = size.width
     sprite.height = size.height

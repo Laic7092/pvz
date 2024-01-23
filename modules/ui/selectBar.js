@@ -1,5 +1,5 @@
 import Card from "./card.js"
-import { Size2D, Interactive, Renderable } from "../basic/basic.js"
+import { Size2D, Interaction, Renderer } from "../basic/basic.js"
 import hand from "../utils/hand.js"
 
 const size2D = new Size2D({
@@ -17,7 +17,7 @@ export default class SelectBar {
             })
         }
         this.cards.forEach((card, idx) => {
-            card.interactive = new Interactive('static', 'pointerdown', () => {
+            card.interaction = new Interaction('static', 'pointerdown', () => {
                 hand.content = card
                 console.log('cardPointerDown', hand)
             })
@@ -26,7 +26,7 @@ export default class SelectBar {
                 x: idx * width,
                 y: 0
             }
-            card.renderable = new Renderable(position, card.size)
+            card.renderer = new Renderer(position, card.size)
         })
     }
 
