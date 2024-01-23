@@ -1,43 +1,9 @@
-const sprites = new Map()
-sprites.set('ground', 'assets/img/dark.png')
-
-class Cell {
-    // 贴图和位置还有待思考。。。
-    type // 地板，草地,水面，屋顶
-    position = { x: 0, y: 0 }
-    size = 20
-    baseSprite
-    isEmpty = true
-    curPlant
-    extraSprite
-    constructor(type = 'ground', position) {
-        this.type = type
-        this.baseSprite = sprites.get(this.type)
-        this.position = position
-    }
-
-    plant(plant) {
-        if (!this.isEmpty) {
-            this.curPlant = plant
-            this.isEmpty = false
-            this.extraSprite = plant.baseSprite
-        }
-    }
-
-    clear() {
-        if (!this.isEmpty) {
-            this.curPlant = null
-            this.isEmpty = true
-            this.extraSprite = null
-        }
-    }
-}
-
+import * as PIXI from '../../pixi.mjs'
+import Cell from './cell.js'
 
 class Floor {
     row = 6
     col = 9
-    // cells = Array.from({ length: this.row }, () => new Array(this.col).fill(null));
     cells = null
 
     constructor(option) {
@@ -56,9 +22,28 @@ class Floor {
         const cells = Array.from({ length: this.row }, () => new Array(this.col).fill(new Cell()));
         this.cells = cells
     }
-
-
 }
 
-export default Floor
+const container = new PIXI.Container()
+container.x = 100
+container.y = 100
+const sizeX = 120
+const sizeY = 150
+
+for (let i = 0; i < 5; i++) {
+    const row = []
+    for (let j = 0; j < 9; j++) {
+        const path = (i + j) % 2 === 0 ? '/assets/img/dark.png' : '/assets/img/light.png'
+        const grass = PIXI.Sprite.from(path)
+        grass.position.x = j * sizeX
+        grass.position.y = i * sizeY
+        row.push(grass)
+    }
+    container.addChild(...row)
+}
+
+
+
+export const model = new Floor()
+export const view = container
 

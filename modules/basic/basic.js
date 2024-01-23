@@ -1,7 +1,7 @@
 export class Size2D {
     width
     height
-    constructor({ width, height } = {}) {
+    constructor({ width, height } = { width: 0, height: 0 }) {
         this.width = width
         this.height = height
     }
@@ -20,7 +20,7 @@ export class Renderer {
     enabled
     position
     size
-    constructor(position = new Vector2(), size = new Size2D()) {
+    constructor({ position, size } = { position: new Vector2(), size: new Size2D() }) {
         this.enabled = true
         this.position = position
         this.size = size
