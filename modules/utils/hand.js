@@ -40,5 +40,5 @@ hand.on('globalpointermove', (e) => {
 })
 
 
-export const model = new Hand()
-export const view = hand
+export const handModel = new Hand()
+export const handview = hand

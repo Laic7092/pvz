@@ -1,6 +1,6 @@
 import Card from "./card.js"
 import { Size2D, Interaction, Renderer } from "../basic/basic.js"
-import { model as hand } from "../utils/hand.js"
+import { handModel } from "../utils/hand.js"
 import * as PIXI from '../../pixi.mjs'
 
 const size2D = new Size2D({
@@ -19,7 +19,7 @@ class SelectBar {
         }
         this.cards.forEach((card, idx) => {
             card.interaction = new Interaction('static', 'pointerdown', () => {
-                hand.holdObject(card.content)
+                handModel.holdObject(card.content)
             })
             const { width, height } = card.size
             const position = {
