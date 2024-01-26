@@ -1,4 +1,4 @@
-import { Renderer, Interaction } from '../basic/basic.js'
+import { Renderer } from '../basic/basic.js'
 import * as PIXI from '../../pixi.mjs'
 
 class Hand {

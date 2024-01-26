@@ -17,7 +17,7 @@ const config = {
             y: 0
         }
     },
-    children: new Array(option.col).fill().map(() => new MySprite({
+    children: new Array(option.col).fill(0).map(() => new MySprite({
         name: 'card',
         props: {
             path: '/assets/img/shoot.webp',

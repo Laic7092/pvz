@@ -27,7 +27,7 @@ class Floor {
         const { row, col } = option
         this.row = row
         this.col = col
-        this.cells = new Array(row).fill().map(() => new Array(col).fill().map(() => new Cell()))
+        this.cells = new Array(row).fill(0).map(() => new Array(col).fill(0).map(() => new Cell()))
         this.init()
     }
 

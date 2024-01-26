@@ -21,7 +21,7 @@ class SelectBar {
             card.interaction = new Interaction('static', 'pointerdown', () => {
                 handModel.holdObject(card.content)
             })
-            const { width, height } = card.size
+            const { width } = card.size
             const position = {
                 x: idx * width,
                 y: 0
@@ -41,7 +41,7 @@ class SelectBar {
 
 const container = new PIXI.Container()
 const selectBar = new SelectBar(['sunFlower', 'shoot'])
-selectBar.cards.forEach((card, idx) => {
+selectBar.cards.forEach(card => {
     const { interaction, renderer } = card
     const path = card.content.baseSpritePath
     const sprite = PIXI.Sprite.from(path)

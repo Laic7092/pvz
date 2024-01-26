@@ -1,4 +1,4 @@
-import { MyContainer, MySprite } from "./BasicClass.js"
+import { MyContainer } from "./BasicClass.js"
 
 // 理論上來說，Grid只是一个布局的组件，内容是随意的
 // 传入一维数组，按照瓦Grid布局排列
@@ -14,7 +14,7 @@ class Grid extends MyContainer {
         super(config)
         const { row, col, cellWidth, cellHeight } = option
         Object.assign(this, { row, col, cellWidth, cellHeight })
-        this.cellCfgs = new Array(row).fill().map(() => new Array(col).fill().map(() => ({})))
+        this.cellCfgs = new Array(row).fill(0).map(() => new Array(col).fill(0).map(() => ({})))
         this.setLayout(cellWidth, cellHeight)
         this.doLayout()
     }

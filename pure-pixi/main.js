@@ -12,18 +12,7 @@ const rootContainer = app.stage
 
 app.stage.addChild(handController.model)
 app.stage.addChild(floorController.model)
-const selectBarModel = render(selectBar.render(), rootContainer)
+render(selectBar.render(), rootContainer)
 
 console.log(floorController)
 console.log(handController)
-let cnt = 0
-let fps = 60
-app.ticker.add((delta) => {
-    return
-    // if (cnt++ <= fps) return
-    selectBarModel.children.forEach(child => {
-        child.x += Math.random() * 5
-        child.y += Math.random() * 5
-    })
-    // cnt = 0
-});

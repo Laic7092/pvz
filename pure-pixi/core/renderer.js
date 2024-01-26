@@ -19,7 +19,7 @@ function renderer(vnode, container) {
 }
 
 function mountElement(vnode, container) {
-    const { type, props, children, state } = vnode
+    const { type, props, children } = vnode
     const pixiContainer = baseType.get(type)(props)
 
     const handlerSymbol = Symbol.for('handlers')
@@ -49,15 +49,15 @@ function render(vnode, container) {
         const pixiContainer = baseType.get(type)(props)
 
         // 设置属性
-        if (vnode.props) {
+        if (props) {
             for (let key in vnode.props) {
                 pixiContainer[key] = vnode.props[key];
             }
         }
 
         // 递归渲染子节点
-        if (Array.isArray(vnode.children)) {
-            vnode.children.forEach(child => {
+        if (Array.isArray(children)) {
+            children.forEach(child => {
                 render(child, pixiContainer);
             });
         }
@@ -66,7 +66,6 @@ function render(vnode, container) {
         container && container.addChild(pixiContainer);
         displayObject = pixiContainer
     } else if (typeof type === 'object') {
-        const { state } = vnode
     }
 
 
