@@ -1,6 +1,6 @@
 import { Grid } from "../core/ExtensionClass.js"
-import { MySprite } from "../core/BasicClass.js"
-import {  render } from "../core/renderer.js"
+import { MySprite, Vector2 } from "../core/BasicClass.js"
+import { render } from "../core/renderer.js"
 
 const option = {
     row: 5,
@@ -12,10 +12,7 @@ const option = {
 const config = {
     name: 'floor',
     props: {
-        position: {
-            x: 100,
-            y: 200
-        },
+        position: new Vector2(100, 200),
         eventMode: 'static',
         [Symbol.for('handlers')]: {
             pointerdown() {

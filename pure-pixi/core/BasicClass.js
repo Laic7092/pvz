@@ -1,9 +1,10 @@
 export class Vector2 {
     x
     y
-    constructor({ x, y } = { x: 0, y: 0 }) {
-        this.x = x
-        this.y = y
+    constructor(x = 0, y = 0) {
+        if (typeof x !== "number" || x < 0) x = 0
+        if (typeof y !== "number" || x < 0) y = 0
+        Object.assign(this, { x, y })
     }
 }
 
@@ -11,14 +12,17 @@ class MyContainer {
     type = 'container'
     name
     props
+    state
     children
-    constructor({ props = {}, children, name } = {}) {
-        this.name = name
-        this.props = props
-        // props.position || (props.position = new Vector2())
-        props.position || (props.position = { x: 0, y: 0 })
-        if (children)
-            this.children = this.flattening(children)
+    constructor({ props, children, name, state } = {}) {
+        if (Object.prototype.toString.call(props) !== '[object Object]') {
+            props = {}
+        }
+        if (!props.position instanceof Vector2) {
+            props.position = new Vector2()
+        }
+        Object.assign(this, { name, state, children, props })
+        Array.isArray(children) && (this.children = this.flattening(children))
     }
     // 二维数组转一维
     flattening(children) {
@@ -34,10 +38,11 @@ class MyContainer {
     }
     // 渲染内容
     render() {
-        const { type, props, children } = this
+        const { type, props, children, state } = this
         return {
             type,
             props,
+            state,
             children
         }
     }

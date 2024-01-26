@@ -1,5 +1,5 @@
 import { Grid } from "../core/ExtensionClass.js"
-import { MySprite } from "../core/BasicClass.js"
+import { MySprite,Vector2 } from "../core/BasicClass.js"
 
 
 const option = {
@@ -12,10 +12,7 @@ const option = {
 const config = {
     name: 'selectBar',
     props: {
-        position: {
-            x: 0,
-            y: 0
-        }
+        position: new Vector2()
     },
     children: new Array(option.col).fill(0).map(() => new MySprite({
         name: 'card',
