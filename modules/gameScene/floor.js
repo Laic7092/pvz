@@ -39,7 +39,6 @@ class Floor {
                 cell.type = (i + j) % 2 === 0 ? 'ground' : 'ground_dark'
             });
         });
-        // console.log(this.cells)
     }
 
     getCell(x, y) {
@@ -53,15 +52,11 @@ class Floor {
         const mcell = this.cells[x][y]
         // const vcell = this.getCell(x, y)
         const vcell = mcell.test
-
         const { baseSpritePath: path } = content
         const sprite = PIXI.Sprite.from(path)
         sprite.width = 75
         sprite.height = 75
         vcell.addChild(sprite)
-        // console.log(cell, vcell)
-        // console.log(handModel)
-        // cell.plant()
     }
 }
 
@@ -86,8 +81,6 @@ for (let i = 0; i < row; i++) {
 }
 
 floorView.eventMode = 'static'
-
-
 floorView.on('pointerdown', (e) => {
     const { x, y } = e
     const localX = x - 100
@@ -96,20 +89,15 @@ floorView.on('pointerdown', (e) => {
     const _y = Math.floor(localX / sizeX)
     floorModel.updateCell(_x, _y)
 })
-floorView.on('pointermove', (e) => {
-    const { x, y } = e
-    // console.log('move', { x, y }, e)
-    const localX = x - 100
-    const loclaY = y - 100
-    const row = Math.floor(loclaY / sizeY)
-    const col = Math.floor(localX / sizeX)
-    // console.log('x:', row, 'y:', col)
-    // floorModel.updateCell(row, col)
-
-})
+// floorView.on('pointermove', (e) => {
+//     const { x, y } = e
+//     const localX = x - 100
+//     const loclaY = y - 100
+//     const row = Math.floor(loclaY / sizeY)
+//     const col = Math.floor(localX / sizeX)
+// })
 
 export {
     floorModel,
     floorView
 }
-
