@@ -1,13 +1,8 @@
-import * as PIXI from './pixi.mjs'
-import { selectBar } from './components/SelectBar.js'
-
-
-const app = new PIXI.Application({ background: '#1099bb', resizeTo: window });
-document.body.appendChild(app.view);
-const rootContainer = app.stage
+import * as PIXI from '/pixi.mjs'
 
 function render(vnode, container) {
     let displayObject = null
+    if (!vnode) return
     // 判断虚拟节点的类型
     if (vnode.tag === 'container') {
         // 容器节点
@@ -16,26 +11,19 @@ function render(vnode, container) {
         // 设置属性
         if (vnode.props) {
             for (let key in vnode.props) {
-                if (key !== 'position') {
-                    pixiContainer[key] = vnode.props[key];
-                }
-            }
-
-            // 设置位置
-            if (vnode.props.position) {
-                pixiContainer.position.set(vnode.props.position.x, vnode.props.position.y);
+                pixiContainer[key] = vnode.props[key];
             }
         }
 
         // 递归渲染子节点
-        if (vnode.children) {
+        if (Array.isArray(vnode.children)) {
             vnode.children.forEach(child => {
                 render(child, pixiContainer);
             });
         }
 
         // 将容器节点添加到父容器中
-        container.addChild(pixiContainer);
+        container && container.addChild(pixiContainer);
         displayObject = pixiContainer
     } else if (vnode.tag === 'sprite') {
         // Sprite节点
@@ -51,21 +39,28 @@ function render(vnode, container) {
         }
 
         // 将Sprite节点添加到父容器中
-        container.addChild(sprite);
+        container && container.addChild(sprite);
         displayObject = sprite
+    } else {
+        debugger
     }
+
+    const symbols = Object.getOwnPropertySymbols(vnode.props)
+    if (symbols.includes(Symbol.for('handlers')))
+        setInteractive(vnode.props[Symbol.for('handlers')], displayObject)
     return displayObject
 }
 
-const selectBarModel = render(selectBar.render(), rootContainer)
+function setInteractive(handlers, displayObject) {
+    for (const key in handlers) {
+        if (Object.hasOwnProperty.call(handlers, key)) {
+            const handler = handlers[key];
+            displayObject.on(key, handler)
+        }
+    }
+    console.log(handlers)
+}
 
-let cnt = 0
-let fps = 60
-app.ticker.add((delta) => {
-    // if (cnt++ <= fps) return
-    selectBarModel.children.forEach(child => {
-        child.x += Math.random()*5
-        child.y += Math.random()*5
-    })
-    // cnt = 0
-});
+export {
+    render
+}
