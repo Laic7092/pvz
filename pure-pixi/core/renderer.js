@@ -1,4 +1,4 @@
-import * as PIXI from '/pixi.mjs'
+import * as PIXI from '../../pixi.mjs'
 
 // 返回基础对象
 const baseType = new Map()
@@ -25,7 +25,7 @@ function mountElement(vnode, container) {
     const handlerSymbol = Symbol.for('handlers')
     const symbols = Object.getOwnPropertySymbols(props)
     if (symbols.includes(handlerSymbol))
-        setInteractive(props[handlerSymbol], displayObject)
+        setInteractive(props[handlerSymbol], pixiContainer)
 
     if (Array.isArray(children)) {
         children.forEach(child => renderer(child, pixiContainer))
@@ -65,9 +65,12 @@ function render(vnode, container) {
         // 将容器节点添加到父容器中
         container && container.addChild(pixiContainer);
         displayObject = pixiContainer
-    } else if (typeof type === 'object') {
     }
 
+    const handlerSymbol = Symbol.for('handlers')
+    const symbols = Object.getOwnPropertySymbols(props)
+    if (symbols.includes(handlerSymbol))
+        setInteractive(props[handlerSymbol], displayObject)
 
     return displayObject
 }
