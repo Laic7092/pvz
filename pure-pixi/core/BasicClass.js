@@ -8,7 +8,7 @@ export class Vector2 {
 }
 
 class MyContainer {
-    tag = 'container'
+    type = 'container'
     name
     props
     children
@@ -34,9 +34,9 @@ class MyContainer {
     }
     // 渲染内容
     render() {
-        const { tag, props, children } = this
+        const { type, props, children } = this
         return {
-            tag,
+            type,
             props,
             children
         }
@@ -44,14 +44,14 @@ class MyContainer {
 }
 
 class MySprite extends MyContainer {
-    tag = 'sprite'
+    type = 'sprite'
     constructor(config) {
         super(config)
     }
 }
 
 class MyText extends MySprite {
-    tag = 'text'
+    type = 'text'
     constructor(config) {
         super(config)
     }

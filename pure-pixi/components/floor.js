@@ -1,6 +1,6 @@
 import { Grid } from "../core/ExtensionClass.js"
 import { MySprite } from "../core/BasicClass.js"
-import { render } from "../core/renderer.js"
+import { renderer, render } from "../core/renderer.js"
 
 const option = {
     row: 5,
