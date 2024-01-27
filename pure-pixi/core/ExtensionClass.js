@@ -14,33 +14,21 @@ class Grid extends MyContainer {
         super(config)
         const { row, col, cellWidth, cellHeight } = option
         Object.assign(this, { row, col, cellWidth, cellHeight })
-        this.cellCfgs = new Array(row).fill(0).map(() => new Array(col).fill(0).map(() => ({})))
-        this.setLayout(cellWidth, cellHeight)
-        this.doLayout()
+        this.cellCfgs = new Array(row * col).fill(0).map(() => ({}))
+        if (Array.isArray(this.children) && this.children.length === row * col)
+            this.setLayout(row, col, cellWidth, cellHeight)
     }
 
-    setLayout(cellWidth, cellHeight) {
-        this.cellCfgs.forEach((row, i) => {
-            row.forEach((cell, j) => {
-                const x = j * cellWidth
-                const y = i * cellHeight
-                cell.position = {
-                    x,
-                    y
-                }
-            });
-        });
-    }
+    setLayout(row, col, cellWidth, cellHeight) {
+        for (let i = 0; i < row; i++) {
+            for (let j = 0; j < col; j++) {
+                Reflect.set(this.children[i * col + j].props, 'position', {
+                    x: j * cellWidth,
+                    y: i * cellHeight
+                })
+            }
 
-    doLayout() {
-        const children = this.children
-        if (!Array.isArray(children)) return
-        children.forEach((child, idx) => {
-            const i = Math.floor(idx / this.col)
-            const j = idx % this.col
-            const { position } = this.cellCfgs[i][j]
-            child.props.position = position
-        })
+        }
     }
 }
 

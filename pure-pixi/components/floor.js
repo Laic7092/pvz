@@ -1,6 +1,7 @@
 import { Grid } from "../core/ExtensionClass.js"
 import { MySprite, Vector2 } from "../core/BasicClass.js"
 import { render } from "../core/renderer.js"
+import { handController } from "../utils/hand.js"
 
 const option = {
     row: 5,
@@ -15,8 +16,17 @@ const config = {
         position: new Vector2(100, 200),
         eventMode: 'static',
         [Symbol.for('handlers')]: {
-            pointerdown() {
-                console.log(666)
+            pointerdown(e) {
+                if (handController.hasObject()) {
+                    const { position } = this
+                    const { x, y } = e
+                    const localX = x - position.x
+                    const localY = y - position.y
+                    const i = Math.floor(localY / option.cellHeight)
+                    const j = Math.floor(localX / option.cellWidth)
+                    if (floorController.isCellEmty(i, j))
+                        floorController.fillCell(i, j)
+                }
             }
         }
     }
@@ -29,44 +39,56 @@ for (let i = 0; i < option.row; i++) {
             name: 'cell',
             props: {
                 path: (i + j) % 2 === 0 ? '/assets/img/dark.png' : '/assets/img/light.png'
+            },
+            state: {
+                isEmpty: true
             }
         }))
     }
 }
 config.children = children
-const floor = new Grid(option, config)
 
-const floorModel = render(floor.render())
-
-const floorController = {
-    floor,
-    model: floorModel,
-    getCell(x, y) {
-        return floorModel.getChildAt(x * this.row + y)
+const templateObject = new Grid(option, config)
+const vnode = templateObject.render()
+const view = render(vnode)
+const model = {
+    ...vnode,
+    getCell(i, j) {
+        return this.children[i * option.col + j]
     },
-    updateCell(x, y) {
-        const content = floorModel.releaseObject()
-        if (!content) return
-        // debugger
-        const mcell = this.cells[x][y]
-        // const vcell = this.getCell(x, y)
-        const vcell = mcell.test
-        const { baseSpritePath: path } = content
-        const sprite = PIXI.Sprite.from(path)
-        sprite.width = 75
-        sprite.height = 75
-        vcell.addChild(sprite)
+    fillCell(i, j, vnode) {
+        const cell = this.getCell(i, j)
+        cell.state.isEmpty = false
+        if (!Array.isArray(cell.children)) {
+            cell.children = [vnode]
+        } else {
+            cell.children.push(vnode)
+        }
+    },
+    clearCell() {
+        const cell = this.getCell(i, j)
+        cell.state.isEmpty = true
+        cell.children.pop()
     }
 }
-// floorView.eventMode = 'static'
-// floorView.on('pointerdown', (e) => {
-//     const { x, y } = e
-//     const localX = x - 100
-//     const loclaY = y - 100
-//     const _x = Math.floor(loclaY / sizeY)
-//     const _y = Math.floor(localX / sizeX)
-//     floorModel.updateCell(_x, _y)
-// })
+
+const floorController = {
+    model,
+    view,
+    isCellEmty(i, j) {
+        return model.getCell(i, j).state.isEmpty
+    },
+    fillCell(i, j) {
+        const vnode = handController.releaseObject()
+        model.fillCell(i, j, vnode)
+        const childView = render(vnode)
+        childView.position = {
+            x: 1,
+            y: 1
+        }
+        view.children[i * option.col + j].addChild(childView)
+    }
+}
 
 export {
     floorController

@@ -47,7 +47,7 @@ function render(vnode, container) {
     const { type, props, children } = vnode
     if (typeof type === 'string') {
         const pixiContainer = baseType.get(type)(props)
-
+        pixiContainer._vnode = vnode
         // 设置属性
         if (props) {
             for (let key in vnode.props) {
