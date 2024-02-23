@@ -10,7 +10,7 @@ const style = new PIXI.TextStyle({
 });
 
 const TOTAL = 1000
-let rate = 0
+let rate = 0.5
 
 function changeRate(val) {
     rate = val

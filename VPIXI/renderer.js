@@ -6,7 +6,6 @@ baseType.set('container', () => new PIXI.Container())
 baseType.set('sprite', () => new PIXI.Sprite())
 baseType.set('text', () => new PIXI.Text())
 
-
 //双向链接？
 class PIXIObj {
     _vnode // 我的对象
@@ -14,26 +13,21 @@ class PIXIObj {
 class vnode {
     el // PIXI对象
 }
-
+document.body.insertBefore
 const renderer = createRenderer({
     createElement(type) {
         console.log(`创建元素 ${type}`)
         return baseType.get(type)()
     },
-    setElementText(el, text) {
-        console.log(`设置 ${JSON.stringify(el)} 的文本内容：${text}`)
-        el.textContent = text
-    },
     insert(el, parent, anchor = null) {
         console.log(`将 ${el} 添加到${parent} 下`)
-        parent.addChild(el)
+        parent.insertBefore(el, anchor)
     }
 })
 
 function createRenderer(options) {
     const {
         createElement,
-        setElementText,
         insert
     } = options
     function unmount(vnode) {
@@ -43,11 +37,9 @@ function createRenderer(options) {
             parent.removeChild(vnode.el)
         }
     }
-    function mountElement(vnode, container) {
+    function mountElement(vnode, container, anchor) {
         const el = vnode.el = createElement(vnode.type)
-        if (typeof vnode.children === 'string') {
-            setElementText(el, vnode.children)
-        } else if (Array.isArray(vnode.children)) {
+        if (Array.isArray(vnode.children)) {
             // 如果 children 是数组，则遍历每一个子节点，并调用 patch 函数挂载它们
             vnode.children.forEach(child => {
                 patch(null, child, el)
@@ -59,7 +51,7 @@ function createRenderer(options) {
                 patchProps(el, key, null, vnode.props[key])
             }
         }
-        insert(el, container)
+        insert(el, container, anchor)
     }
     function mountComponent(vnode, container, anchor) {
         // 通过 vnode 获取组件的选项对象，即 vnode.type
@@ -90,7 +82,7 @@ function createRenderer(options) {
         patchChildren(n1, n2, el)
     }
     function patchComponent(n1, n2) {
-
+        patchElement(n1, n2)
     }
     function patchProps(el, key, prevValue, nextValue) {
         if (/^on/.test(key)) {
@@ -109,17 +101,14 @@ function createRenderer(options) {
                         }
                     }
                     invoker.value = nextValue
-                    el.addEventListener(name, invoker)
+                    el.on(name, invoker)
                 } else {
                     invoker.value = nextValue
                 }
             } else if (invoker) {
-                el.removeEventListener(name, invoker)
+                el.off(name, invoker)
             }
-        } else if (key === 'class') {
-            el.className = nextValue || ''
-        }
-        else if (key === 'path') {
+        } else if (key === 'path') {
             el.texture = PIXI.Texture.from(nextValue)
         }
         else {
@@ -127,19 +116,74 @@ function createRenderer(options) {
         }
     }
     function patchChildren(n1, n2, container) {
-        if (typeof n2.children === 'string') {
+        if (Array.isArray(n2.children)) {
             if (Array.isArray(n1.children)) {
-                n1.children.forEach((c) => unmount(c))
-            }
-            setElementText(container, n2.children)
-        } else if (Array.isArray(n2.children)) {
-            if (Array.isArray(n1.children)) {
-                // 代码运行到这里，则说明新旧子节点都是一组子节点，这里涉及核心的Diff 算法
-                // n1.children.forEach((c) => unmount(c))
+                const oldChildren = n1.children
+                const newChildren = n2.children
+                let lastIndex = 0
 
-                n2.children.forEach((c, idx) => patch(n1.children[idx], c, container))
+                // 旧的节点的序号是递增序列，0，1，2；出现新节点，匹配出来如果也是递增序列就不需要移动？
+                // 如果0，1，2 -> 2，0，1
+                for (let i = 0; i < newChildren.length; i++) {
+                    const newVNode = newChildren[i]
+                    let j = 0
+                    // 在第一层循环中定义变量 find，代表是否在旧的一组子节点中找到可复用的节点， 
+                    // 初始值为 false，代表没找到 
+                    let find = false
+                    for (j; j < oldChildren.length; j++) {
+                        const oldVNode = oldChildren[j]
+                        if (newVNode.key === oldVNode.key) {
+                            // 一旦找到可复用的节点，则将变量 find 的值设为 true 
+                            find = true
+                            patch(oldVNode, newVNode, container)
+                            if (j < lastIndex) {
+                                const prevVNode = newChildren[i - 1]
+                                if (prevVNode) {
+                                    const anchor = prevVNode.el.nextSibling
+                                    insert(newVNode.el, container, anchor)
+                                }
+                            } else {
+                                lastIndex = j
+                            }
+                            break
+                        }
+                    }
+                    // 如果代码运行到这里，find 仍然为 false， 
+                    // 说明当前 newVNode 没有在旧的一组子节点中找到可复用的节点 
+                    // 也就是说，当前 newVNode 是新增节点，需要挂载 
+                    if (!find) {
+                        // 为了将节点挂载到正确位置，我们需要先获取锚点元素 
+                        // 首先获取当前 newVNode 的前一个 vnode 节点 
+                        const prevVNode = newChildren[i - 1]
+                        let anchor = null
+                        if (prevVNode) {
+                            // 如果有前一个 vnode 节点，则使用它的下一个兄弟节点作为锚点元素 
+                            anchor = prevVNode.el.nextSibling
+                        } else {
+                            // 如果没有前一个 vnode 节点，说明即将挂载的新节点是第一个子节点 
+                            // 这时我们使用容器元素的 firstChild 作为锚点 
+                            anchor = container.firstChild
+                        }
+                        // 挂载 newVNode 
+                        patch(null, newVNode, container, anchor)
+                    }
+                }
+
+                // 上一步的更新操作完成后 
+                // 遍历旧的一组子节点 
+                for (let i = 0; i < oldChildren.length; i++) {
+                    const oldVNode = oldChildren[i]
+                    // 拿旧子节点 oldVNode 去新的一组子节点中寻找具有相同 key 值的节点 
+                    const has = newChildren.find(
+                        vnode => vnode.key === oldVNode.key
+                    )
+                    if (!has) {
+                        // 如果没有找到具有相同 key 值的节点，则说明需要删除该节点 
+                        // 调用 unmount 函数将其卸载 
+                        unmount(oldVNode)
+                    }
+                }
             } else {
-                setElementText(container, '')
                 n2.children.forEach(c => patch(null, c, container))
             }
         } else {
@@ -147,14 +191,10 @@ function createRenderer(options) {
             // 旧子节点是一组子节点，只需逐个卸载即可
             if (Array.isArray(n1.children)) {
                 n1.children.forEach(c => unmount(c))
-            } else if (typeof n1.children === 'string') {
-                // 旧子节点是文本子节点，清空内容即可
-                setElementText(container, '')
             }
-            // 如果也没有旧子节点，那么什么都不需要做
         }
     }
-    function patch(n1, n2, container) {
+    function patch(n1, n2, container, anchor) {
         // 在这里编写渲染逻辑
         if (n1 && n2.type !== n1.type) {
             unmount(n1)
@@ -165,7 +205,7 @@ function createRenderer(options) {
         // 如果 n2.type 的值是字符串类型，则它描述的是普通标签元素
         if (typeof type === 'string') {
             if (!n1) {
-                mountElement(n2, container)
+                mountElement(n2, container, anchor)
             } else {
                 patchElement(n1, n2)
             }
@@ -176,8 +216,6 @@ function createRenderer(options) {
             } else {
                 patchComponent(n1, n2)
             }
-        } else if (type === 'xxx') {
-            // 处理其他类型的 vnode
         }
     }
     function render(vnode, container) {
