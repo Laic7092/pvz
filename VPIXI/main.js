@@ -5,49 +5,64 @@ const app = new PIXI.Application({ background: '#1099bb', resizeTo: window });
 document.body.appendChild(app.view);
 console.log('asa', renderer);
 
+const style = new PIXI.TextStyle({
+    fontSize: 12
+});
+
+const TOTAL = 1000
+let rate = 0
+
+function changeRate(val) {
+    rate = val
+}
+window.changeRate = changeRate
+
+function rd() {
+    return {
+        type: 'text',
+        props: {
+            text: parseInt(Math.random() * TOTAL) + '',
+            position: {
+                x: parseInt(Math.random() * 1920),
+                y: parseInt(Math.random() * 1080)
+            },
+            style
+        }
+    }
+}
+
+function rdi() {
+    return new Array(1000).fill(0).map(() => Math.random() > rate)
+}
+
+function fc() {
+    let a = []
+    for (let index = 0; index < TOTAL; index++) {
+        a.push(rd());
+    }
+    return a
+}
+
+function up(a, b) {
+    return a.map((element, i) => element ? rd() : b[i])
+}
+
 const vnode = {
     type: 'container',
-    children: [
-        {
-            type: 'sprite',
-            props: {
-                path: '/assets/img/sunFlower.webp',
-                width: 100,
-                height: 100
-            }
-        },
-        {
-            type: 'text',
-            props: {
-                text: '1'
-            }
-        }
-    ]
+    children: fc()
 }
 
 renderer.render(vnode, app.stage)
 console.log(app.stage)
 
-setInterval(() => {
-    let nNOde = {
+let old = vnode
+
+function loop() {
+    let newNode = {
         type: 'container',
-        children: [
-            {
-                type: 'sprite',
-                props: {
-                    path: Math.random() > 0.5 ? '/assets/img/sunFlower.webp' : '/assets/img/shoot.webp',
-                    width: 100 * Math.random(),
-                    height: 100 * Math.random()
-                }
-            },
-            {
-                type: 'text',
-                props: {
-                    text: Math.random() * 1000 + ''
-                }
-            }
-        ]
+        children: up(rdi(), old.children)
     }
-    console.log('aa', app.stage.children[0].children[0])
-    renderer.render(nNOde, app.stage)
-}, 1000)
+    old = newNode
+    renderer.render(newNode, app.stage)
+}
+setInterval(loop, 0)
