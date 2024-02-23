@@ -1,16 +1,32 @@
+import * as PIXI from '../pixi.mjs'
+
+// 返回基础对象
+const baseType = new Map()
+baseType.set('container', () => new PIXI.Container())
+baseType.set('sprite', () => new PIXI.Sprite())
+baseType.set('text', () => new PIXI.Text())
+
+
+//双向链接？
+class PIXIObj {
+    _vnode // 我的对象
+}
+class vnode {
+    el // PIXI对象
+}
 
 const renderer = createRenderer({
-    createElement(tag) {
-        console.log(`创建元素 ${tag}`)
-        return { tag }
+    createElement(type) {
+        console.log(`创建元素 ${type}`)
+        return baseType.get(type)()
     },
     setElementText(el, text) {
         console.log(`设置 ${JSON.stringify(el)} 的文本内容：${text}`)
         el.textContent = text
     },
     insert(el, parent, anchor = null) {
-        console.log(`将 ${JSON.stringify(el)} 添加到${JSON.stringify(parent)} 下`)
-        parent.children = el
+        console.log(`将 ${el} 添加到${parent} 下`)
+        parent.addChild(el)
     }
 })
 
@@ -102,8 +118,12 @@ function createRenderer(options) {
             }
         } else if (key === 'class') {
             el.className = nextValue || ''
-        } else {
-            el[key] == nextValue
+        }
+        else if (key === 'path') {
+            el.texture = PIXI.Texture.from(nextValue)
+        }
+        else {
+            el[key] = nextValue
         }
     }
     function patchChildren(n1, n2, container) {
@@ -114,7 +134,10 @@ function createRenderer(options) {
             setElementText(container, n2.children)
         } else if (Array.isArray(n2.children)) {
             if (Array.isArray(n1.children)) {
-                //// 代码运行到这里，则说明新旧子节点都是一组子节点，这里涉及核心的Diff 算法
+                // 代码运行到这里，则说明新旧子节点都是一组子节点，这里涉及核心的Diff 算法
+                // n1.children.forEach((c) => unmount(c))
+
+                n2.children.forEach((c, idx) => patch(n1.children[idx], c, container))
             } else {
                 setElementText(container, '')
                 n2.children.forEach(c => patch(null, c, container))
@@ -171,3 +194,5 @@ function createRenderer(options) {
         render
     }
 }
+
+export default renderer
