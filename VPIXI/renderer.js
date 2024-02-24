@@ -120,6 +120,11 @@ function createRenderer(options) {
             if (Array.isArray(n1.children)) {
                 const oldChildren = n1.children
                 const newChildren = n2.children
+
+                for (let index = 0; index < 1000; index++) {
+                    patch(newChildren[index], oldChildren[index], container)
+                }
+                return
                 let lastIndex = 0
 
                 // 旧的节点的序号是递增序列，0，1，2；出现新节点，匹配出来如果也是递增序列就不需要移动？

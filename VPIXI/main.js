@@ -10,15 +10,10 @@ const style = new PIXI.TextStyle({
 });
 
 const TOTAL = 1000
-let rate = 0.5
 
-function changeRate(val) {
-    rate = val
-}
-window.changeRate = changeRate
-
-function rd() {
+function rd({ el, key }) {
     return {
+        el, key,
         type: 'text',
         props: {
             text: parseInt(Math.random() * TOTAL) + '',
@@ -31,38 +26,53 @@ function rd() {
     }
 }
 
-function rdi() {
-    return new Array(1000).fill(0).map(() => Math.random() > rate)
-}
-
 function fc() {
     let a = []
     for (let index = 0; index < TOTAL; index++) {
-        a.push(rd());
+        a.push(rd({ key: index }));
     }
     return a
 }
 
-function up(a, b) {
-    return a.map((element, i) => element ? rd() : b[i])
+function loop() {
+    let newc = old.children.map(text => isCoinT() ? rd(text) : text)
+    let newNode = {
+        ...old,
+        children: newc
+    }
+    old = newNode
+    renderer.render(newNode, app.stage)
 }
 
 const vnode = {
     type: 'container',
     children: fc()
 }
-
-renderer.render(vnode, app.stage)
-console.log(app.stage)
-
 let old = vnode
 
-function loop() {
-    let newNode = {
-        type: 'container',
-        children: up(rdi(), old.children)
-    }
-    old = newNode
-    renderer.render(newNode, app.stage)
+let test = isCoinT()
+console.log(test)
+function isCoinT() {
+    return Math.random() > 0.5
 }
-setInterval(loop, 0)
+
+if (test) {
+    renderer.render(vnode, app.stage)
+    console.log(app.stage)
+    app.ticker.add(() => loop());
+} else {
+    let a = new Array(TOTAL).fill(0).map(() => new PIXI.Text('', style))
+    app.stage.addChild(...a)
+    app.ticker.add(() => {
+        a.forEach(c => {
+            if (isCoinT()) {
+                c.text = parseInt(Math.random() * TOTAL) + ''
+                c.position = {
+                    x: parseInt(Math.random() * 1920),
+                    y: parseInt(Math.random() * 1080)
+                }
+            }
+        })
+    });
+}
+
